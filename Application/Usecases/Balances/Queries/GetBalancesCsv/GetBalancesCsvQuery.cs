@@ -21,9 +21,9 @@ namespace JfService.Balance.Application.Usecases.Balances.Queries.GetBalancesCsv
         {
             private readonly ILogger<Handler> logger;
             private readonly IBalanceSheetService balanceSheetService;
-            private readonly ICsvService csvService;
+            private readonly ICsvExportService csvService;
 
-            public Handler(ILogger<Handler> logger, IBalanceSheetService balanceSheetService, ICsvService csvService)
+            public Handler(ILogger<Handler> logger, IBalanceSheetService balanceSheetService, ICsvExportService csvService)
             {
                 this.logger = logger;
                 this.balanceSheetService = balanceSheetService;

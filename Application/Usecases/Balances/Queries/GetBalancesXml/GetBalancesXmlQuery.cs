@@ -21,9 +21,9 @@ namespace JfService.Balance.Application.Usecases.Balances.Queries.GetBalancesXml
         {
             private readonly ILogger<Handler> logger;
             private readonly IBalanceSheetService balanceSheetService;
-            private readonly IXmlService xmlService;
+            private readonly IXmlExportService xmlService;
 
-            public Handler(ILogger<Handler> logger, IBalanceSheetService balanceSheetService, IXmlService xmlService)
+            public Handler(ILogger<Handler> logger, IBalanceSheetService balanceSheetService, IXmlExportService xmlService)
             {
                 this.logger = logger;
                 this.balanceSheetService = balanceSheetService;

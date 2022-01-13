@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,7 +36,7 @@ namespace JfService.Balance.Application.Usecases.Balances.Queries.GetBalancesCsv
                 try
                 {
                     var balanceSheet = await balanceSheetService.GetAsync(request.AccountId, cancellationToken);
-                    return csvService.Serialize(balanceSheet);
+                    return csvService.Serialize(balanceSheet.SelectMany(x => x.Items));
                 }
                 catch (Exception e)
                 {

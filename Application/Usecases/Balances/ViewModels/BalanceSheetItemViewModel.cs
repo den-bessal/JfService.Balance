@@ -21,7 +21,7 @@ namespace JfService.Balance.Application.Usecases.Balances.ViewModels
         /// <summary>
         /// Начислено за период.
         /// </summary>
-        public decimal Calculation { get; set; }
+        public decimal CalculationSum { get; set; }
 
         /// <summary>
         /// Оплачено за период.

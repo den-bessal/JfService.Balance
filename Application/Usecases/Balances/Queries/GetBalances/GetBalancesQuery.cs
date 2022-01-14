@@ -17,7 +17,9 @@ namespace JfService.Balance.Application.Usecases.Balances.Queries.GetBalances
         /// <summary>
         /// Идентификатор ЛС.
         /// </summary>
-        public long AccountId { get; set; }
+        public long AccountId { get; }
+
+        public GetBalancesQuery(long accountId) => AccountId = accountId;
 
         private class Handler : IRequestHandler<GetBalancesQuery, BalanceSheetViewModel>
         {

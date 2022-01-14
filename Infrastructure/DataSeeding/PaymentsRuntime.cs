@@ -2,9 +2,11 @@
 using JfService.Balance.Application.DbContexts;
 using JfService.Balance.Infrastructure.Models;
 using JfService.Balance.Infrastructure.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -26,11 +28,11 @@ namespace JfService.Balance.Infrastructure.DataSeeding
 
         public async Task Seed()
         {
-            var jsonContent = await File.ReadAllTextAsync(options.FilePath);
+            var jsonContent = await File.ReadAllTextAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, options.FilePath));
             var jArr = JArray.Parse(jsonContent);
             var paymentDtos = JsonConvert.DeserializeObject<List<PaymentDto>>(jArr?.ToString());
             var payments = mapper.Map<List<Domain.Entities.Payment>>(paymentDtos);
-            context.Payments.RemoveRange(context.Payments); // TODO: Убрать этот костыль!!!
+            context.Database.ExecuteSqlRaw("DELETE FROM Payments");
             context.Payments.AddRange(payments);
             await context.SaveChangesAsync();
         }

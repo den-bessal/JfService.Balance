@@ -68,7 +68,7 @@ namespace JfService.Balance.Application.Services
 
                     var closingBalanceByYear = openingBalanceByYear + calculationSumByYear - paidSumByYear;
 
-                    yearGroup.Items.Add(new BalanceSheetItem() 
+                    yearGroup.Items.Insert(0, new BalanceSheetItem() 
                     {
                         PeriodName = $"{balancesByYear.Key} год",
                         OpeningBalance = openingBalanceByYear,
@@ -94,7 +94,7 @@ namespace JfService.Balance.Application.Services
 
                         var closingBalanceByQuarter = openingBalanceByQuarter + calculationSumQuarter - paidSumByQuarter;
 
-                        quarterGroup.Items.Add(new BalanceSheetItem()
+                        quarterGroup.Items.Insert(0, new BalanceSheetItem()
                         {
                             PeriodName = $"{balancesByQuarter.Key}-й квартал {balancesByYear.Key} года",
                             OpeningBalance = openingBalanceByQuarter,
@@ -123,7 +123,7 @@ namespace JfService.Balance.Application.Services
                             var period = balancesByMonth.First().Period;
                             var periodName = $"{period.ToString("MMMM", new CultureInfo("ru-Ru"))} {period.Year} года";
 
-                            monthGroup.Items.Add(new BalanceSheetItem()
+                            monthGroup.Items.Insert(0, new BalanceSheetItem()
                             {
                                 PeriodName = periodName,
                                 OpeningBalance = openingBalanceByMonth,

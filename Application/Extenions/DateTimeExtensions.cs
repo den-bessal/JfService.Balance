@@ -14,5 +14,10 @@ namespace JfService.Balance.Application.Extenions
                         ? 3
                         : 4;
         }
+
+        public static int MonthDiff(this DateTime dt1, DateTime dt2)
+        {
+            return ((dt1.Year - dt2.Year) * 12) + dt1.Month - dt2.Month;
+        }
     }
 }

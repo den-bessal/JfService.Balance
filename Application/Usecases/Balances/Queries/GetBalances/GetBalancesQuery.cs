@@ -38,7 +38,7 @@ namespace JfService.Balance.Application.Usecases.Balances.Queries.GetBalances
             {
                 try
                 {
-                    var balanceSheet = await balanceSheetService.GetAsync(request.AccountId, cancellationToken);
+                    var balanceSheet = await balanceSheetService.GetBalanceSheetAsync(request.AccountId, cancellationToken);
                     return mapper.Map<BalanceSheetViewModel>(balanceSheet);
                 }
                 catch (Exception e)

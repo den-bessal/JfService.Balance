@@ -3,9 +3,11 @@ using JfService.Balance.Application.Exceptions;
 using JfService.Balance.Application.Extenions;
 using JfService.Balance.Application.Interfaces;
 using JfService.Balance.Application.Models;
+using JfService.Balance.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -24,7 +26,8 @@ namespace JfService.Balance.Application.Services
             this.context = context;
         }
 
-        public async Task<BalanceSheet> GetAsync(long accountId, CancellationToken ct = default)
+        /// <inheritdoc/>
+        public async Task<BalanceSheet> GetBalanceSheetAsync(long accountId, CancellationToken ct = default)
         {
             try
             {
@@ -68,7 +71,7 @@ namespace JfService.Balance.Application.Services
 
                     var closingBalanceByYear = openingBalanceByYear + calculationSumByYear - paidSumByYear;
 
-                    yearGroup.Items.Insert(0, new BalanceSheetItem() 
+                    yearGroup.Items.Insert(0, new BalanceSheetItem()
                     {
                         PeriodName = $"{balancesByYear.Key} год",
                         OpeningBalance = openingBalanceByYear,
@@ -143,6 +146,42 @@ namespace JfService.Balance.Application.Services
                     quarterGroup,
                     monthGroup
                 };
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, e.Message);
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<decimal> GetCurrentDebtAsync(long accountId, CancellationToken ct = default)
+        {
+            try
+            {
+                var balances = await context.Balances.AsNoTracking()
+                                                     .Where(x => x.AccountId == accountId)
+                                                     .OrderBy(x => x.Period)
+                                                     .ToListAsync(ct);
+
+                if (!balances.Any())
+                    throw new NotFoundException("Object not found", $"Для ЛС {accountId} не обнаружено ни одной записи");
+
+                var payments = await context.Payments.AsNoTracking()
+                                                     .Where(x => x.AccountId == accountId)
+                                                     .ToListAsync(ct);
+
+                var lastPeriod = balances.Last().Period;
+                var lastBalancesBy12Month = balances.Where(b => lastPeriod.MonthDiff(b.Period) < 12)
+                                                    .OrderBy(b => b.Period);
+
+                var lastPaymentsBy12Month = payments.Where(p => lastPeriod.MonthDiff(p.Date) < 12);
+
+                var openingBalance = lastBalancesBy12Month.First().InBalance;
+                var calculationSum = lastBalancesBy12Month.Sum(x => x.Calculation);
+                var paidSum = lastPaymentsBy12Month.Sum(x => x.Sum);
+
+                return openingBalance + calculationSum - paidSum;
             }
             catch (Exception e)
             {

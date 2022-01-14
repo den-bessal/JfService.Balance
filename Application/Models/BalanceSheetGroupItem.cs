@@ -15,6 +15,6 @@ namespace JfService.Balance.Application.Models
         /// <summary>
         /// Элементы оборотной ведомости.
         /// </summary>
-        public ICollection<BalanceSheetItem> Items { get; set; } = new List<BalanceSheetItem>();
+        public IList<BalanceSheetItem> Items { get; set; } = new List<BalanceSheetItem>();
     }
 }

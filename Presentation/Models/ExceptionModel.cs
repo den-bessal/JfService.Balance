@@ -5,6 +5,8 @@
     /// </summary>
     public class ExceptionModel
     {
+        public ExceptionModel() { }
+
         public ExceptionModel(string errorMessage, string detail)
         {
             ErrorMessage = errorMessage;

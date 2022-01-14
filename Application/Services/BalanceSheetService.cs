@@ -1,4 +1,5 @@
 ﻿using JfService.Balance.Application.DbContexts;
+using JfService.Balance.Application.Exceptions;
 using JfService.Balance.Application.Extenions;
 using JfService.Balance.Application.Interfaces;
 using JfService.Balance.Application.Models;
@@ -31,6 +32,9 @@ namespace JfService.Balance.Application.Services
                                                      .Where(x => x.AccountId == accountId)
                                                      .OrderBy(x => x.Period)
                                                      .ToListAsync(ct);
+
+                if (!balances.Any())
+                    throw new NotFoundException("Object not found", $"Для ЛС {accountId} не обнаружено ни одной записи");
 
                 var payments = await context.Payments.AsNoTracking()
                                                      .Where(x => x.AccountId == accountId)

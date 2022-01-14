@@ -30,6 +30,7 @@ namespace JfService.Balance.Infrastructure.DataSeeding
             var jArr = JArray.Parse(jsonContent);
             var paymentDtos = JsonConvert.DeserializeObject<List<PaymentDto>>(jArr?.ToString());
             var payments = mapper.Map<List<Domain.Entities.Payment>>(paymentDtos);
+            context.Payments.RemoveRange(context.Payments); // TODO: Убрать этот костыль!!!
             context.Payments.AddRange(payments);
             await context.SaveChangesAsync();
         }

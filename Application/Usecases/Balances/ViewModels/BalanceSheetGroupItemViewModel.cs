@@ -1,6 +1,8 @@
 ﻿using JfService.Balance.Application.Mapping;
 using JfService.Balance.Application.Models;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace JfService.Balance.Application.Usecases.Balances.ViewModels
 {

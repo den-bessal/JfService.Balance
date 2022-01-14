@@ -30,6 +30,7 @@ namespace JfService.Balance.Infrastructure.DataSeeding
             var jObj = JObject.Parse(jsonContent);
             var balanceDtos = JsonConvert.DeserializeObject<List<BalanceDto>>(jObj["balance"]?.ToString());
             var balances = mapper.Map<List<Domain.Entities.Balance>>(balanceDtos);
+            context.Balances.RemoveRange(context.Balances); // TODO: Убрать этот костыль!!!
             context.Balances.AddRange(balances);
             await context.SaveChangesAsync();
         }

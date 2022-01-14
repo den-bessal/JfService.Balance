@@ -13,19 +13,19 @@ namespace JfService.Balance.Application.Models
         /// <summary>
         /// Год.
         /// </summary>
-        [EnumMember(Value = "Год")]
+        [EnumMember]
         Year,
 
         /// <summary>
         /// Квартал.
         /// </summary>
-        [EnumMember(Value = "Квартал")]
+        [EnumMember]
         Quarter,
 
         /// <summary>
         /// Месяц.
         /// </summary>
-        [EnumMember(Value = "Месяц")]
+        [EnumMember]
         Month
     }
 }

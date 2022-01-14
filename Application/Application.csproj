@@ -6,6 +6,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Usecases\Balances\Queries\GetBalancesCsv\**" />
+    <Compile Remove="Usecases\Balances\Queries\GetBalancesXml\**" />
+    <EmbeddedResource Remove="Usecases\Balances\Queries\GetBalancesCsv\**" />
+    <EmbeddedResource Remove="Usecases\Balances\Queries\GetBalancesXml\**" />
+    <None Remove="Usecases\Balances\Queries\GetBalancesCsv\**" />
+    <None Remove="Usecases\Balances\Queries\GetBalancesXml\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Extenions\XmlWriterExtensions.cs" />
+    <Compile Remove="Interfaces\ICsvExportService.cs" />
+    <Compile Remove="Interfaces\IXmlExportService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="CsvHelper" Version="27.2.1" />

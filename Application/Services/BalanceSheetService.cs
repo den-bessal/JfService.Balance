@@ -36,104 +36,100 @@ namespace JfService.Balance.Application.Services
                                                      .Where(x => x.AccountId == accountId)
                                                      .ToListAsync(ct);
 
-                // Группировка по году
                 BalanceSheetGroupItem yearGroup = new() { PeriodType = PeriodType.Year };
-                decimal lastClosingBalanceByYear = 0;
+                BalanceSheetGroupItem quarterGroup = new() { PeriodType = PeriodType.Quarter };
+                BalanceSheetGroupItem monthGroup = new() { PeriodType = PeriodType.Month };
 
                 var balanceGroupedByYear = balances.GroupBy(x => x.Period.Year);
+                decimal lastClosingBalanceByYear, lastClosingBalanceByQuarter, lastClosingBalanceByMonth;
+                
+                lastClosingBalanceByYear 
+                    = lastClosingBalanceByQuarter 
+                    = lastClosingBalanceByMonth
+                    = balanceGroupedByYear.First()
+                                          .First().InBalance;
 
+                // По годам
                 foreach (var balancesByYear in balanceGroupedByYear)
                 {
-                    var openingBalance = balancesByYear.First().InBalance;
+                    var openingBalanceByYear = balancesByYear.First().InBalance;
 
-                    if (openingBalance != lastClosingBalanceByYear)
-                        openingBalance = lastClosingBalanceByYear;
+                    if (openingBalanceByYear != lastClosingBalanceByYear)
+                        openingBalanceByYear = lastClosingBalanceByYear;
 
-                    var calculationSum = balancesByYear.Sum(x => x.Calculation);
+                    var calculationSumByYear = balancesByYear.Sum(x => x.Calculation);
 
-                    var paymentsByPeriod = payments.Where(x => x.Date.Year == balancesByYear.Key);
-                    var paidSum = paymentsByPeriod.Sum(x => x.Sum);
+                    var paymentsByYear = payments.Where(x => x.Date.Year == balancesByYear.Key);
+                    var paidSumByYear = paymentsByYear.Sum(x => x.Sum);
 
-                    var closingBalance = openingBalance + calculationSum - paidSum;
+                    var closingBalanceByYear = openingBalanceByYear + calculationSumByYear - paidSumByYear;
 
                     yearGroup.Items.Add(new BalanceSheetItem() 
                     {
                         PeriodName = $"{balancesByYear.Key} год",
-                        OpeningBalance = openingBalance,
-                        CalculationSum = calculationSum,
-                        PaidSum = paidSum,
-                        ClosingBalance = closingBalance
+                        OpeningBalance = openingBalanceByYear,
+                        CalculationSum = calculationSumByYear,
+                        PaidSum = paidSumByYear,
+                        ClosingBalance = closingBalanceByYear
                     });
 
-                    lastClosingBalanceByYear = closingBalance;
-                }
+                    lastClosingBalanceByYear = closingBalanceByYear;
 
-                // Группировка по крваталу
-                BalanceSheetGroupItem quarterGroup = new() { PeriodType = PeriodType.Quarter };
-                decimal lastClosingBalanceByQuarter = 0;
-
-                foreach (var balancesByYear in balanceGroupedByYear)
-                {
+                    // По кварталам
                     foreach (var balancesByQuarter in balancesByYear.GroupBy(x => x.Period.Quarter()))
                     {
-                        var openingBalance = balancesByQuarter.First().InBalance;
+                        var openingBalanceByQuarter = balancesByQuarter.First().InBalance;
 
-                        if (openingBalance != lastClosingBalanceByQuarter)
-                            openingBalance = lastClosingBalanceByQuarter;
+                        if (openingBalanceByQuarter != lastClosingBalanceByQuarter)
+                            openingBalanceByQuarter = lastClosingBalanceByQuarter;
 
-                        var calculationSum = balancesByQuarter.Sum(x => x.Calculation);
+                        var calculationSumQuarter = balancesByQuarter.Sum(x => x.Calculation);
 
-                        var paymentsByPeriod = payments.Where(x => x.Date.Quarter() == balancesByQuarter.Key);
-                        var paidSum = paymentsByPeriod.Sum(x => x.Sum);
+                        var paymentsByQuarter = payments.Where(x => x.Date.Year == balancesByYear.Key && x.Date.Quarter() == balancesByQuarter.Key);
+                        var paidSumByQuarter = paymentsByQuarter.Sum(x => x.Sum);
 
-                        var closingBalance = openingBalance + calculationSum - paidSum;
+                        var closingBalanceByQuarter = openingBalanceByQuarter + calculationSumQuarter - paidSumByQuarter;
 
                         quarterGroup.Items.Add(new BalanceSheetItem()
                         {
                             PeriodName = $"{balancesByQuarter.Key}-й квартал {balancesByYear.Key} года",
-                            OpeningBalance = openingBalance,
-                            CalculationSum = calculationSum,
-                            PaidSum = paidSum,
-                            ClosingBalance = closingBalance
+                            OpeningBalance = openingBalanceByQuarter,
+                            CalculationSum = calculationSumQuarter,
+                            PaidSum = paidSumByQuarter,
+                            ClosingBalance = closingBalanceByQuarter
                         });
 
-                        lastClosingBalanceByQuarter = closingBalance;
-                    }
-                }
+                        lastClosingBalanceByQuarter = closingBalanceByQuarter;
 
-                // Группировка по месяцу
-                BalanceSheetGroupItem monthGroup = new() { PeriodType = PeriodType.Month };
-                decimal lastClosingBalanceByMonth = 0;
-
-                foreach (var balancesByYear in balanceGroupedByYear)
-                {
-                    foreach (var balancesByMonth in balancesByYear.GroupBy(b => b.Period.Month))
-                    {
-                        var openingBalance = balancesByMonth.First().InBalance;
-
-                        if (openingBalance != lastClosingBalanceByMonth)
-                            openingBalance = lastClosingBalanceByMonth;
-
-                        var calculationSum = balancesByMonth.Sum(x => x.Calculation);
-
-                        var paymentsByPeriod = payments.Where(x => x.Date.Month == balancesByMonth.Key);
-                        var paidSum = paymentsByPeriod.Sum(x => x.Sum);
-
-                        var closingBalance = openingBalance + calculationSum - paidSum;
-
-                        var period = balancesByMonth.First().Period;
-                        var periodName = $"{period.ToString("MMM", new CultureInfo("ru-Ru"))} {period.Year} года";
-
-                        monthGroup.Items.Add(new BalanceSheetItem()
+                        // По месяцам
+                        foreach (var balancesByMonth in balancesByQuarter.GroupBy(b => b.Period.Month))
                         {
-                            PeriodName = periodName,
-                            OpeningBalance = openingBalance,
-                            CalculationSum = calculationSum,
-                            PaidSum = paidSum,
-                            ClosingBalance = closingBalance
-                        });
+                            var openingBalanceByMonth = balancesByMonth.First().InBalance;
 
-                        lastClosingBalanceByMonth = closingBalance;
+                            if (openingBalanceByMonth != lastClosingBalanceByMonth)
+                                openingBalanceByMonth = lastClosingBalanceByMonth;
+
+                            var calculationSumByMonth = balancesByMonth.Sum(x => x.Calculation);
+
+                            var paymentsByMonth = payments.Where(x => x.Date.Year == balancesByYear.Key && x.Date.Month == balancesByMonth.Key);
+                            var paidSumByMonth = paymentsByMonth.Sum(x => x.Sum);
+
+                            var closingBalanceByMonth = openingBalanceByMonth + calculationSumByMonth - paidSumByMonth;
+
+                            var period = balancesByMonth.First().Period;
+                            var periodName = $"{period.ToString("MMMM", new CultureInfo("ru-Ru"))} {period.Year} года";
+
+                            monthGroup.Items.Add(new BalanceSheetItem()
+                            {
+                                PeriodName = periodName,
+                                OpeningBalance = openingBalanceByMonth,
+                                CalculationSum = calculationSumByMonth,
+                                PaidSum = paidSumByMonth,
+                                ClosingBalance = closingBalanceByMonth
+                            });
+
+                            lastClosingBalanceByMonth = closingBalanceByMonth;
+                        }
                     }
                 }
 
